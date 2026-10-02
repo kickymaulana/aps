@@ -30,7 +30,6 @@ class EmployeesTable
                 TextColumn::make('current_department_name')->label('Departemen')->searchable()->sortable(),
                 TextColumn::make('current_division_name')->label('Divisi')->searchable()->sortable(),
                 TextColumn::make('current_position_name')->label('Jabatan')->searchable()->sortable(),
-                TextColumn::make('EmailAddress')->label('Email')->searchable(),
                 TextColumn::make('DateIn')->label('Mulai Kerja')->date(),
                 TextColumn::make('DateOut')->label('Selesai Kerja')->date(),
             ])
