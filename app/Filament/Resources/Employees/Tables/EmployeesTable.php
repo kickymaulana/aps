@@ -19,6 +19,7 @@ class EmployeesTable
         return $table
             ->columns([
                 TextColumn::make('EmployeeID')->label('ID')->searchable(),
+                TextColumn::make('IDCardNo')->label('NIK KTP')->searchable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('EmployeeName')->label('Nama')->searchable(),
                 TextColumn::make('EmailAddress')->label('Email')->searchable(),
                 TextColumn::make('DateIn')->label('Mulai Kerja')->date(),
