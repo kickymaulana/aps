@@ -10,6 +10,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 
 class EmployeesTable
@@ -17,10 +18,18 @@ class EmployeesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->addSelect([
+                'current_department_name' => self::lookupQuery('departments', 'DepartmentNo', 'DepartmentName', 'CurrentDepartmentNo'),
+                'current_division_name' => self::lookupQuery('divisions', 'DivisionNo', 'DivisionName', 'CurrentDivisionNo'),
+                'current_position_name' => self::lookupQuery('positions', 'PositionNo', 'PositionName', 'CurrentPositionNo'),
+            ]))
             ->columns([
                 TextColumn::make('EmployeeID')->label('ID')->searchable(),
                 TextColumn::make('IDCardNo')->label('NIK KTP')->searchable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('EmployeeName')->label('Nama')->searchable(),
+                TextColumn::make('current_department_name')->label('Departemen')->searchable()->sortable(),
+                TextColumn::make('current_division_name')->label('Divisi')->searchable()->sortable(),
+                TextColumn::make('current_position_name')->label('Jabatan')->searchable()->sortable(),
                 TextColumn::make('EmailAddress')->label('Email')->searchable(),
                 TextColumn::make('DateIn')->label('Mulai Kerja')->date(),
                 TextColumn::make('DateOut')->label('Selesai Kerja')->date(),
@@ -67,6 +76,14 @@ class EmployeesTable
                 ViewAction::make(),
             ])
             ->defaultSort('EmployeeName');
+    }
+
+    private static function lookupQuery(string $table, string $key, string $name, string $foreignKey): QueryBuilder
+    {
+        return DB::table($table)
+            ->select($name)
+            ->whereColumn($key, 'employees.'.$foreignKey)
+            ->limit(1);
     }
 
     private static function masterFilter(string $column, string $label, string $table, string $key, string $name): SelectFilter
