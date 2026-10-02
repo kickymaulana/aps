@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'sso' => [
+        'authorize_url' => env('SSO_AUTHORIZE_URL'),
+        'token_url' => env('SSO_TOKEN_URL'),
+        'userinfo_url' => env('SSO_USERINFO_URL'),
+        'client_id' => env('SSO_CLIENT_ID'),
+        'client_secret' => env('SSO_CLIENT_SECRET'),
+        'redirect_uri' => env('SSO_REDIRECT_URI'),
+        'scope' => env('SSO_SCOPE', ''),
+        'nik_claim' => env('SSO_NIK_CLAIM', 'nik'),
+    ],
+
 ];
