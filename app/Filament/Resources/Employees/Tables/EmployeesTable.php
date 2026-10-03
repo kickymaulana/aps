@@ -27,9 +27,9 @@ class EmployeesTable
                 TextColumn::make('EmployeeID')->label('ID')->searchable(),
                 TextColumn::make('IDCardNo')->label('NIK KTP')->searchable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('EmployeeName')->label('Nama')->searchable(),
-                TextColumn::make('current_department_name')->label('Departemen')->searchable()->sortable(),
-                TextColumn::make('current_division_name')->label('Divisi')->searchable()->sortable(),
-                TextColumn::make('current_position_name')->label('Jabatan')->searchable()->sortable(),
+                self::masterColumn('current_department_name', 'Departemen', 'departments', 'DepartmentNo', 'DepartmentName', 'CurrentDepartmentNo'),
+                self::masterColumn('current_division_name', 'Divisi', 'divisions', 'DivisionNo', 'DivisionName', 'CurrentDivisionNo'),
+                self::masterColumn('current_position_name', 'Jabatan', 'positions', 'PositionNo', 'PositionName', 'CurrentPositionNo'),
                 TextColumn::make('DateIn')->label('Mulai Kerja')->date(),
                 TextColumn::make('DateOut')->label('Selesai Kerja')->date(),
             ])
@@ -75,6 +75,18 @@ class EmployeesTable
                 ViewAction::make(),
             ])
             ->defaultSort('EmployeeName');
+    }
+
+    private static function masterColumn(string $column, string $label, string $table, string $key, string $name, string $foreignKey): TextColumn
+    {
+        return TextColumn::make($column)
+            ->label($label)
+            ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereExists(fn (QueryBuilder $lookup): QueryBuilder => $lookup
+                ->selectRaw('1')
+                ->from($table)
+                ->whereColumn($table.'.'.$key, 'employees.'.$foreignKey)
+                ->where($table.'.'.$name, 'like', "%{$search}%")))
+            ->sortable();
     }
 
     private static function lookupQuery(string $table, string $key, string $name, string $foreignKey): QueryBuilder
